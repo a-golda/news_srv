@@ -17,6 +17,7 @@ from telegram import (
 
 import json
 import logging
+import random
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -112,17 +113,17 @@ def feed(update: Update, context: CallbackContext) -> None:
     for text in texts:
         update.message.reply_text(text, parse_mode=telegram.ParseMode.MARKDOWN)
 
-
+    local_trends = random.choices(trends, k=6)
     keyboard = [
         [
-            InlineKeyboardButton(trends[0], callback_data='{"button_id": 2, "value": "%s"}' % trends[0]),
-            InlineKeyboardButton(trends[1], callback_data='{"button_id": 2, "value": "%s"}' % trends[1]),
-            InlineKeyboardButton(trends[2], callback_data='{"button_id": 2, "value": "%s"}' % trends[2]),
+            InlineKeyboardButton(local_trends[0], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[0]),
+            InlineKeyboardButton(local_trends[1], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[1]),
+            InlineKeyboardButton(local_trends[2], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[2]),
         ],
         [
-            InlineKeyboardButton(trends[3], callback_data='{"button_id": 2, "value": "%s"}' % trends[3]),
-            InlineKeyboardButton(trends[4], callback_data='{"button_id": 2, "value": "%s"}' % trends[4]),
-            InlineKeyboardButton(trends[5], callback_data='{"button_id": 2, "value": "%s"}' % trends[5]),
+            InlineKeyboardButton(local_trends[3], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[3]),
+            InlineKeyboardButton(local_trends[4], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[4]),
+            InlineKeyboardButton(local_trends[5], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[5]),
         ],
     ]
 
