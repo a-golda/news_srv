@@ -1,15 +1,27 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 class ParseUpdateNewsRequest():
     """
     Parse json given to 'api/update_news'.
     """
     def __init__(self, reqdict):
-        self.news_id = reqdict['news_id']
-        self.tags = reqdict['tags']
-        self.segment = reqdict['segment']
-        self.key_point = reqdict['key_point']
-        self.title = reqdict['title']
-        self.parsed_news = reqdict['parsed_news']
-        self.raw_news = reqdict['raw_news']
+        try:
+            self.news_id = reqdict['news_id']
+            self.tag_id = reqdict['tag_id']
+            self.source = reqdict['source']
+            self.role = reqdict['role']
+            self.url = reqdict['url']
+            self.keywords = reqdict['keywords']
+            self.key_point = reqdict['key_point']
+            self.parsed_news = reqdict['parsed_news']
+            self.score = reqdict['score']
+            self.news_date = reqdict['news_date']
+        except KeyError as e:
+            logger.error(f"Parsing error: {e}")
+
 
 
 class ParseUpdateUsersHistRequest:

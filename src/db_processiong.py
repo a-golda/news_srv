@@ -7,13 +7,15 @@ def update_news_table(reqdict):
     req = ParseUpdateNewsRequest(reqdict)
     table = NewsPostgreUtils()
     table.update_news_table(req.news_id,
-                            req.tags,
-                            req.segment,
+                            req.tag_id,
+                            req.source,
+                            req.role,
+                            req.url,
+                            req.keywords,
                             req.key_point,
-                            req.title,
                             req.parsed_news,
-                            req.raw_news)
-
+                            req.score,
+                            req.news_date)
 
 def select_by_id(reqdict):
     req = SelectNews(reqdict)
