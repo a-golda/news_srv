@@ -65,6 +65,8 @@ def button(update: Update, context: CallbackContext) -> None:
             text=f"Отлично! 😎\n Для того, чтобы получать новости, используй команду /feed"
         )
         logger.info(f"User {query.from_user.id} selected {query.data}")
+        send_info(query.from_user.to_dict(), data["value"])
+
     elif data["button_id"] == 1:
         if data["value"] == 0:
             text = "🔥" * 8
@@ -93,9 +95,12 @@ def button(update: Update, context: CallbackContext) -> None:
 
 
 
-def send_info(user: Any, info: dict) -> None:
+def send_info(user: Any, value: int) -> None:
     """sends info to service"""
-    pass
+    role = "buh" if value == 0 else "business"
+    user_data = dict(user)
+    user_data["role"] = role
+    logger.info(f"Sending user data {user_data}")
 
 
 def help(update: Update, context: CallbackContext) -> None:

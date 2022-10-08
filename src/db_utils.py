@@ -151,7 +151,7 @@ class UsersPostgreUtils:
             logger.error(f"Users table creation failed with exception: {e}")
 
     def update_u_table(self, user_id, is_bot, first_name,
-                       last_name, username, role, langauge_code,
+                       last_name, username, role, language_code,
                        date_updated=datetime.now().timestamp()):
         try:
             with self.db.connect() as conn:
