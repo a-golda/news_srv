@@ -56,7 +56,21 @@ class NewsPostgreUtils:
             result_set = conn.execute(select_statement)
             for row in result_set:
                 result.append(row)
-        return str(result)
+        result = result[0]
+        response = {
+            "news_id" : result[0],
+            "tag_id" : result[1],
+            "source" : result[2],
+            "role" : result[3],
+            "url" : result[4],
+            "keywords" : result[5],
+            "key_point" : result[6],
+            "parsed_news" : result[7],
+            "score" : result[8],
+            "news_date" : result[9],
+            "date_updated" : str(datetime.now())
+        }
+        return response
 
     def delete_by_news_id(self, news_id):
         delete_statement = self.news_table.delete().where(self.news_table.c.news_id == news_id)
@@ -92,10 +106,16 @@ class UsersHistPostgreUtils:
             result_set = conn.execute(select_statement)
             for row in result_set:
                 result.append(row)
-        return str(result)
+        result = result[0]
+        response = {
+            "user_id": result[0],
+            "news_id": result[1],
+            "date_updated": str(datetime.now()),
+        }
+        return response
 
     def delete_by_user_id(self, user_id):
-        delete_statement = self.uh_table.delete().where(self.uh_table.c.news_id == user_id)
+        delete_statement = self.uh_table.delete().where(self.uh_table.c.user_id == user_id)
         with self.db.connect() as conn:
             conn.execute(delete_statement)
 
@@ -141,9 +161,20 @@ class UsersPostgreUtils:
             result_set = conn.execute(select_statement)
             for row in result_set:
                 result.append(row)
-        return str(result)
+        result = result[0]
+        response = {
+            "user_id": result[0],
+            "is_bot": result[1],
+            "first_name": result[2],
+            "last_name": result[3],
+            "username": result[4],
+            "role": result[5],
+            "language_code": result[6],
+            "date_updated": str(datetime.now()),
+        }
+        return response
 
     def delete_by_user_id(self, user_id):
-        delete_statement = self.u_table.delete().where(self.u_table.c.news_id == user_id)
+        delete_statement = self.u_table.delete().where(self.u_table.c.user_id == user_id)
         with self.db.connect() as conn:
             conn.execute(delete_statement)

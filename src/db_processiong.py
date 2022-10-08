@@ -40,8 +40,7 @@ def update_users_table(reqdict):
                          req.last_name,
                          req.username,
                          req.role,
-                         req.language_code,
-                         req.date_updated)
+                         req.language_code)
 
 
 def select_user_by_id(reqdict):
@@ -52,7 +51,7 @@ def select_user_by_id(reqdict):
 
 
 def delete_user_by_id(reqdict):
-    req = SelectUser(reqdict)
+    req = DeleteUser(reqdict)
     table = UsersPostgreUtils()
     result = table.delete_by_user_id(req.user_id)
     return result
@@ -62,8 +61,7 @@ def update_users_hist_table(reqdict):
     req = ParseUpdateUsersHistRequest(reqdict)
     table = UsersHistPostgreUtils()
     table.update_uh_table(req.user_id,
-                          req.news_id,
-                          req.date_updated)
+                          req.news_id)
 
 
 def select_user_hist_by_id(reqdict):
@@ -74,7 +72,7 @@ def select_user_hist_by_id(reqdict):
 
 
 def delete_user_hist_by_id(reqdict):
-    req = SelectUser(reqdict)
+    req = DeleteUser(reqdict)
     table = UsersHistPostgreUtils()
     result = table.delete_by_user_id(req.user_id)
     return result

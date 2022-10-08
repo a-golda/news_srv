@@ -1,8 +1,8 @@
 import logging
 from src.conf import Conf
+from flask import Flask, jsonify, request
 from src.db_processiong import update_news_table, select_user_hist_by_id, delete_by_id, update_users_table, select_by_id
 from src.db_processiong import select_user_by_id, update_users_hist_table, delete_user_by_id, delete_user_hist_by_id
-from flask import Flask, jsonify, request
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

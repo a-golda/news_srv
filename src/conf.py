@@ -18,3 +18,4 @@ class Conf:
 
     SUCCESS_STATUS_CODE: int = 200
     FAILED_STATUS_CODE: int = 400
+

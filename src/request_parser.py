@@ -31,7 +31,6 @@ class ParseUpdateUsersHistRequest:
     def __init__(self, reqdict):
         self.user_id = reqdict['user_id']
         self.news_id = reqdict['news_id']
-        self.date_updated = reqdict['date_updated']
 
 
 class ParseUpdateUsersRequest:
@@ -46,10 +45,9 @@ class ParseUpdateUsersRequest:
         self.username = reqdict['username']
         self.role = reqdict['role']
         self.language_code = reqdict['language_code']
-        self.date_updated = reqdict['date_updated']
 
 
-class SelectNews():
+class SelectNews:
     """
     Parse json given to 'api/update_news'.
     """
@@ -57,7 +55,7 @@ class SelectNews():
         self.news_id = reqdict['news_id']
 
 
-class DeleteNews():
+class DeleteNews:
     """
     Parse json given to 'api/delete_news'.
     """
@@ -73,9 +71,9 @@ class SelectUser:
         self.user_id = reqdict['user_id']
 
 
-class DeleteUser():
+class DeleteUser:
     """
     Parse json given to 'api/delete...'.
     """
     def __init__(self, reqdict):
-        self.user_id = reqdict['news_id']
+        self.user_id = reqdict['user_id']
