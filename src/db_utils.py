@@ -1,4 +1,5 @@
 import logging
+import pandas as pd
 from src.conf import Conf
 from datetime import datetime
 from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, Integer, ARRAY, Float, DateTime, BOOLEAN
@@ -178,3 +179,27 @@ class UsersPostgreUtils:
         delete_statement = self.u_table.delete().where(self.u_table.c.user_id == user_id)
         with self.db.connect() as conn:
             conn.execute(delete_statement)
+
+
+class GetRelevant:
+    def __init__(self):
+        self.db = create_engine(Conf.URL_DB)
+        self.meta = MetaData(self.db)
+        self.df = pd.DataFrame()
+
+    def get_relevant(self, user_id):
+        select_statement = f'select * from news where news_id not in (select news_id from users_history where user_id={user_id})'
+        with self.db.connect() as conn:
+            result_set = conn.execute(select_statement)
+        self.df = pd.DataFrame(result_set)
+        self.df.columns = ['news_id', 'tag_id', 'source', 'role', 'url',
+                           'keywords', 'key_point', 'parsed_news', 'score',
+                           'news_date', 'date_updated']
+        self.df = self.df.sort_values('score', ascending=False)
+        if self.df.shape[0] <= Conf.NEWS_AMOUNT:
+            pass
+        else:
+            self.df = self.df.iloc[:Conf.NEWS_AMOUNT-1]
+        relevant_news_id = self.df.news_id.unique()
+        return relevant_news_id
+

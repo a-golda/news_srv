@@ -1,6 +1,6 @@
 from request_parser import ParseUpdateNewsRequest, ParseUpdateUsersHistRequest, ParseUpdateUsersRequest
 from request_parser import SelectNews, DeleteNews, SelectUser, DeleteUser
-from db_utils import NewsPostgreUtils, UsersPostgreUtils, UsersHistPostgreUtils
+from db_utils import NewsPostgreUtils, UsersPostgreUtils, UsersHistPostgreUtils, GetRelevant
 
 
 def update_news_table(reqdict):
@@ -77,3 +77,10 @@ def delete_user_hist_by_id(reqdict):
     table = UsersHistPostgreUtils()
     result = table.delete_by_user_id(req.user_id)
     return result
+
+
+def get_relevant_news(reqdict):
+    req = SelectUser(reqdict)
+    gr = GetRelevant()
+    news_ids = gr.get_relevant(req.user_id)
+    return news_ids

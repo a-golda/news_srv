@@ -13,8 +13,12 @@ class Conf:
     URL_SELECT_USERS_HIST_BY_ID = '/api/select_users_history_by_id'
     URL_DELETE_USERS_HIST_BY_ID = '/api/delete_users_history_by_id'
 
+    URL_GET_RELEVANT_NEWS = '/api/get_relevant_news'
+
     URL_DB = 'postgresql://localhost/andrey.golda'
     mama = 'papa-penis'
+
+    NEWS_AMOUNT = 5
 
     SUCCESS_STATUS_CODE: int = 200
     FAILED_STATUS_CODE: int = 400
