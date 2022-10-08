@@ -1,18 +1,21 @@
 from request_parser import ParseUpdateNewsRequest, ParseUpdateUsersHistRequest, ParseUpdateUsersRequest
 from request_parser import SelectNews, DeleteNews, SelectUser, DeleteUser
-from db_utils import NewsPostgreUtils, UsersPostgreUtils, UsersHistPostgreUtils
+from db_utils import NewsPostgreUtils, UsersPostgreUtils, UsersHistPostgreUtils, GetRelevant
 
 
 def update_news_table(reqdict):
     req = ParseUpdateNewsRequest(reqdict)
     table = NewsPostgreUtils()
     table.update_news_table(req.news_id,
-                            req.tags,
-                            req.segment,
+                            req.tag_id,
+                            req.source,
+                            req.role,
+                            req.url,
+                            req.keywords,
                             req.key_point,
-                            req.title,
                             req.parsed_news,
-                            req.raw_news)
+                            req.score,
+                            req.news_date)
 
 
 def select_by_id(reqdict):
@@ -38,8 +41,7 @@ def update_users_table(reqdict):
                          req.last_name,
                          req.username,
                          req.role,
-                         req.language_code,
-                         req.date_updated)
+                         req.language_code)
 
 
 def select_user_by_id(reqdict):
@@ -50,7 +52,7 @@ def select_user_by_id(reqdict):
 
 
 def delete_user_by_id(reqdict):
-    req = SelectUser(reqdict)
+    req = DeleteUser(reqdict)
     table = UsersPostgreUtils()
     result = table.delete_by_user_id(req.user_id)
     return result
@@ -60,8 +62,7 @@ def update_users_hist_table(reqdict):
     req = ParseUpdateUsersHistRequest(reqdict)
     table = UsersHistPostgreUtils()
     table.update_uh_table(req.user_id,
-                          req.news_id,
-                          req.date_updated)
+                          req.news_id)
 
 
 def select_user_hist_by_id(reqdict):
@@ -72,7 +73,14 @@ def select_user_hist_by_id(reqdict):
 
 
 def delete_user_hist_by_id(reqdict):
-    req = SelectUser(reqdict)
+    req = DeleteUser(reqdict)
     table = UsersHistPostgreUtils()
     result = table.delete_by_user_id(req.user_id)
     return result
+
+
+def get_relevant_news(reqdict):
+    req = SelectUser(reqdict)
+    gr = GetRelevant()
+    news_ids = gr.get_relevant(req.user_id)
+    return news_ids
