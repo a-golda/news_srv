@@ -8,6 +8,7 @@ from nltk import ngrams
 from joblib import Parallel, delayed
 
 from sklearn.preprocessing import scale
+from pymorphy2 import MorphAnalyzer
 import click
 
 import logging
@@ -47,13 +48,11 @@ def extract_indices(words, indices):
     return [words[i] for i in indices]
 
 
-def find_start_end_positions(text, words):
-    positions = []
+def hightlight_keywords(text, words):
     for word in words:
-        for match in re.finditer(re.escape(word), text):
-            positions.append(match.start())
-            positions.append(match.end())
-    return positions
+        pattern = re.compile("(" + re.escape(word) + ')', flags=re.IGNORECASE)
+        text = pattern.sub('*\g<1>*', text)
+    return text
 
 
 class ScoredDataset:
@@ -102,9 +101,32 @@ class ScoredDataset:
         self.df = self.df.loc[self.df.date_iso == self.max_date]
         self.df = self.df.merge(mean_score, how="left", on="id")
 
-    def find_keywords_in_text(self) -> None:
-        self.trends_main = self.trends[: self.top_trends]
+        self.df_trends = df_ngrams.loc[
+            (df_ngrams.date_iso == self.max_date),
+            ["id", "n_grams"]
+        ]
+
+    def classify_trends(self) -> None:
+
+        morph = MorphAnalyzer()
+
+        cleared_trends = []
+        for trend in self.trends[: 2000]:
+            flag = False
+            for word in trend.split():
+                tag = morph.tag(word)[0]
+                if "NOUN" in tag or "VERB" in tag:
+                    flag = True
+            if flag:
+                cleared_trends.append(trend)
+
+        self.trends_main = cleared_trends[: self.top_trends]
         logger.info(f"Top 10 trends {self.trends_main[: 10]}")
+        self.df_trends = self.df_trends.loc[self.df_trends.n_grams.isin(self.trends_main)]
+        
+
+    def find_keywords_in_text(self) -> None:
+        
         positions = list(
             map(lambda x: find_trends(x, self.trends_main), self.df["n_grams"].tolist())
         )
@@ -115,21 +137,20 @@ class ScoredDataset:
             )
         )
 
-        raw_texts = self.df.text.str.lower()
-
-        start_end = list(map(
-            lambda x: find_start_end_positions(x[0], x[1]),
-            zip(raw_texts, keywords)
+        texts_highlighted = list(map(
+            lambda x: hightlight_keywords(x[0], x[1]),
+            zip(self.df.text, keywords)
         ))
 
-        self.df["positions"] = start_end
+        self.df["texts_format"] = texts_highlighted
 
     def postprocess(self) -> None:
         X = self.df[["score_trend", "reposts_count", "views_count"]]
         self.df["score"] = score(X)
 
-    def save(self, fname: str, trends_path: str) -> None:
+    def save(self, fname: str, fname_trends: str, trends_path: str) -> None:
         self.df.to_csv(fname, index=None)
+        self.df_trends.to_csv(fname_trends, index=None)
 
         with open(trends_path, "w", encoding="utf-8") as file:
             json.dump(self.trends_main, file)
@@ -139,6 +160,8 @@ class ScoredDataset:
         self.load_data()
         logger.info("Finding trends")
         self.find_trends()
+        logger.info("classifying trends")
+        self.classify_trends()
         logger.info("Finding key words")
         self.find_keywords_in_text()
         logger.info("Postprocessing")
@@ -147,17 +170,19 @@ class ScoredDataset:
 @click.command()
 @click.option("--input", help="Input data folder", required=True, type=click.STRING)
 @click.option("--output", help="Output data folder", required=True, type=click.STRING)
-@click.option("--output_trends", help="Output trends data file", required=True, type=click.STRING)
+@click.option("--output_trends", help="Output trends file", required=True, type=click.STRING)
+@click.option("--output_json", help="Output trends json file", required=True, type=click.STRING)
 @click.option("--top_trends", help="Top trends to find", default=30, type=click.INT)
 def create_scoring_dataset(
     input: str,
     output: str,
     output_trends: str,
+    output_json: str,
     top_trends: int
 ) -> None:
     dataset = ScoredDataset(input, top_trends)
     dataset.main_etl()
-    dataset.save(output, output_trends)
+    dataset.save(output, output_trends, output_json)
 
 if __name__ == "__main__":
     create_scoring_dataset()

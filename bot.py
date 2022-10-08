@@ -7,6 +7,7 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from telegram.ext.conversationhandler import ConversationHandler
 from telegram.ext import CallbackQueryHandler
+import telegram
 
 from telegram import (
     Update,
@@ -73,6 +74,18 @@ def button(update: Update, context: CallbackContext) -> None:
         query.edit_message_text(text=text)
         logger.info(f"User {query.from_user.id} reaction {emotion}")
 
+    elif data["button_id"] == 2:
+        trend = data["value"]
+        query.edit_message_text("OK")
+        logger.info(f"User {query.from_user.id} selected {trend}")
+        news_id  = df_trends.loc[df_trends.n_grams == trend, "id"].sample(3).tolist()
+        sample = df.loc[df["id"].isin(news_id)]
+        texts = sample.texts_format.tolist()
+        for text in texts:
+            context.bot.send_message(chat_id=update.effective_chat.id, 
+                                     text=text, parse_mode=telegram.ParseMode.MARKDOWN)
+
+
 
 def send_info(user: Any, info: dict) -> None:
     """sends info to service"""
@@ -94,12 +107,28 @@ def feed(update: Update, context: CallbackContext) -> None:
 
     ### DANGER: REMOVE THIS
     sample = df.sample(n=3, weights="score")
-    texts = sample.text.tolist()
+    texts = sample.texts_format.tolist()
 
-    keywords = sample.positions
+    for text in texts:
+        update.message.reply_text(text, parse_mode=telegram.ParseMode.MARKDOWN)
 
-    for keywords, text in zip(keywords, texts):
-        update.message.reply_text(text)
+
+    keyboard = [
+        [
+            InlineKeyboardButton(trends[0], callback_data='{"button_id": 2, "value": "%s"}' % trends[0]),
+            InlineKeyboardButton(trends[1], callback_data='{"button_id": 2, "value": "%s"}' % trends[1]),
+            InlineKeyboardButton(trends[2], callback_data='{"button_id": 2, "value": "%s"}' % trends[2]),
+        ],
+        [
+            InlineKeyboardButton(trends[3], callback_data='{"button_id": 2, "value": "%s"}' % trends[3]),
+            InlineKeyboardButton(trends[4], callback_data='{"button_id": 2, "value": "%s"}' % trends[4]),
+            InlineKeyboardButton(trends[5], callback_data='{"button_id": 2, "value": "%s"}' % trends[5]),
+        ],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Ключевые тренды недели 🔥", reply_markup=reply_markup)
+
 
     keyboard = [
         [
@@ -122,12 +151,16 @@ def read_data() -> DataFrame:
     df = read_csv("./data/final.csv")
     df.score = df.score.add(df.score.min())
     df.score = df.score.divide(df.score.sum())
-    return df
+    
+    df_trends =read_csv("./data/trends.csv")
+
+    return df, df_trends
 
 
 def main():
     with open("token.txt", "r", encoding="utf-8") as file:
         token = file.read()
+
     updater = Updater(token, use_context=True)
     updater.dispatcher.add_handler(CommandHandler("start", start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))
@@ -137,5 +170,7 @@ def main():
 
 
 if __name__ == "__main__":
-    df = read_data()
+    with open("./data/trends.json", "r", encoding="utf-8") as file:
+        trends = json.load(file)[: 6]
+    df, df_trends  = read_data()
     main()
