@@ -58,17 +58,17 @@ class NewsPostgreUtils:
                 result.append(row)
         result = result[0]
         response = {
-            "news_id" : result[0],
-            "tag_id" : result[1],
-            "source" : result[2],
-            "role" : result[3],
-            "url" : result[4],
-            "keywords" : result[5],
-            "key_point" : result[6],
-            "parsed_news" : result[7],
-            "score" : result[8],
-            "news_date" : result[9],
-            "date_updated" : str(datetime.now())
+            "news_id": result[0],
+            "tag_id": result[1],
+            "source": result[2],
+            "role": result[3],
+            "url": result[4],
+            "keywords": result[5],
+            "key_point": result[6],
+            "parsed_news": result[7],
+            "score": result[8],
+            "news_date": result[9],
+            "date_updated": result[10]
         }
         return response
 
@@ -110,7 +110,7 @@ class UsersHistPostgreUtils:
         response = {
             "user_id": result[0],
             "news_id": result[1],
-            "date_updated": str(datetime.now()),
+            "date_updated": result[2],
         }
         return response
 
@@ -170,7 +170,7 @@ class UsersPostgreUtils:
             "username": result[4],
             "role": result[5],
             "language_code": result[6],
-            "date_updated": str(datetime.now()),
+            "date_updated": result[7]
         }
         return response
 

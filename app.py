@@ -10,6 +10,7 @@ logger.setLevel(logging.DEBUG)
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
+
 @app.route(Conf.URL_ALIVE, methods=['GET'])
 def alive():
     """
@@ -33,7 +34,7 @@ def update_news():
         return jsonify(Conf.FAILED_STATUS_CODE)
 
 
-@app.route(Conf.URL_SELECT_NEWS_BY_ID, methods=['POST'])
+@app.route(Conf.URL_SELECT_NEWS_BY_ID, methods=['GET'])
 def select_news():
     """
         Select news by news_id
@@ -77,7 +78,7 @@ def update_user():
         return jsonify(Conf.FAILED_STATUS_CODE)
 
 
-@app.route(Conf.URL_SELECT_USERS_BY_ID, methods=['POST'])
+@app.route(Conf.URL_SELECT_USERS_BY_ID, methods=['GET'])
 def select_user():
     """
         Select user's info by user_id
@@ -121,7 +122,7 @@ def update_user_history():
         return jsonify(Conf.FAILED_STATUS_CODE)
 
 
-@app.route(Conf.URL_SELECT_USERS_HIST_BY_ID, methods=['POST'])
+@app.route(Conf.URL_SELECT_USERS_HIST_BY_ID, methods=['GET'])
 def select_user_hist():
     """
         Select user's history by user_id

@@ -17,6 +17,7 @@ def update_news_table(reqdict):
                             req.score,
                             req.news_date)
 
+
 def select_by_id(reqdict):
     req = SelectNews(reqdict)
     table = NewsPostgreUtils()
