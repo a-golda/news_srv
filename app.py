@@ -1,6 +1,6 @@
 import logging
 from src.conf import Conf
-from api.db_precessing import update_news_table, select_by_id, delete_by_id
+from src.db_processiong import update_news_table, select_by_id, delete_by_id
 from flask import Flask, jsonify, request
 
 

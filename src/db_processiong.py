@@ -1,10 +1,10 @@
-from request_parser import ParseUpdateRequest, SelectNews, DeleteNews
-from postgres_utils import NewsPostgreUtils
+from request_parser import ParseUpdateNewsRequest, ParseUpdateUsersHistRequest, ParseUpdateUsersRequest
+from request_parser import SelectNews, DeleteNews, SelectUser, DeleteUser
+from db_utils import NewsPostgreUtils, UsersPostgreUtils, UsersHistPostgreUtils
+
 
 def update_news_table(reqdict):
-    """see flasksrv"""
-
-    req = ParseUpdateRequest(reqdict)
+    req = ParseUpdateNewsRequest(reqdict)
     table = NewsPostgreUtils()
     table.update_news_table(req.news_id,
                             req.tags,
@@ -29,4 +29,50 @@ def delete_by_id(reqdict):
     return result
 
 
+def update_users_table(reqdict):
+    req = ParseUpdateUsersRequest(reqdict)
+    table = UsersPostgreUtils()
+    table.update_u_table(req.user_id,
+                         req.is_bot,
+                         req.first_name,
+                         req.last_name,
+                         req.username,
+                         req.role,
+                         req.language_code,
+                         req.date_updated)
 
+
+def select_user_by_id(reqdict):
+    req = SelectUser(reqdict)
+    table = UsersPostgreUtils()
+    result = table.select_by_user_id(req.user_id)
+    return result
+
+
+def delete_user_by_id(reqdict):
+    req = SelectUser(reqdict)
+    table = UsersPostgreUtils()
+    result = table.delete_by_user_id(req.user_id)
+    return result
+
+
+def update_users_hist_table(reqdict):
+    req = ParseUpdateUsersHistRequest(reqdict)
+    table = UsersHistPostgreUtils()
+    table.update_uh_table(req.user_id,
+                          req.news_id,
+                          req.date_updated)
+
+
+def select_user_hist_by_id(reqdict):
+    req = SelectUser(reqdict)
+    table = UsersHistPostgreUtils()
+    result = table.select_by_user_id(req.user_id)
+    return result
+
+
+def delete_user_hist_by_id(reqdict):
+    req = SelectUser(reqdict)
+    table = UsersHistPostgreUtils()
+    result = table.delete_by_user_id(req.user_id)
+    return result
