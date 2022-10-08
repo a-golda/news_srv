@@ -3,7 +3,8 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-class ParseUpdateNewsRequest():
+
+class ParseUpdateNewsRequest:
     """
     Parse json given to 'api/update_news'.
     """
@@ -21,7 +22,6 @@ class ParseUpdateNewsRequest():
             self.news_date = reqdict['news_date']
         except KeyError as e:
             logger.error(f"Parsing error: {e}")
-
 
 
 class ParseUpdateUsersHistRequest:
