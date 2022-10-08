@@ -68,7 +68,7 @@ class ScoredDataset:
 
     def find_trends(self) -> None:
         texts_norm = self.df.texts_norm.str.split().tolist()
-        texts = self.df.text.str.lower().str.split().tolist()
+        texts = self.df.texts_standard.str.split().tolist()
         self.df["n_grams"] = Parallel(n_jobs=-1)(map(delayed(get_ngrams), texts_norm))
         self.df["n_grams_raw"] = Parallel(n_jobs=-1)(map(delayed(get_ngrams), texts))
         df_ngrams = self.df.explode("n_grams", ignore_index=True)
@@ -130,12 +130,17 @@ class ScoredDataset:
         positions = list(
             map(lambda x: find_trends(x, self.trends_main), self.df["n_grams"].tolist())
         )
+
+        self.df["positions"] = positions
+
         keywords = list(
             map(
                 lambda x: extract_indices(x[0], x[1]),
                 zip(self.df["n_grams_raw"].tolist(), positions),
             )
         )
+
+        self.df["keywords"] = keywords
 
         texts_highlighted = list(map(
             lambda x: hightlight_keywords(x[0], x[1]),

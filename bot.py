@@ -81,10 +81,15 @@ def button(update: Update, context: CallbackContext) -> None:
         logger.info(f"User {query.from_user.id} selected {trend}")
         news_id  = df_trends.loc[df_trends.n_grams == trend, "id"].sample(3).tolist()
         sample = df.loc[df["id"].isin(news_id)]
-        texts = sample.texts_format.tolist()
-        for text in texts:
-            context.bot.send_message(chat_id=update.effective_chat.id, 
-                                     text=text, parse_mode=telegram.ParseMode.MARKDOWN)
+        texts_fmt = sample.texts_format.tolist()
+        texts = sample.text.tolist()
+        for i, (text, text_fmt) in enumerate(zip(texts, texts_fmt)):
+            try:
+                context.bot.send_message(chat_id=update.effective_chat.id, 
+                                         text=text_fmt, parse_mode=telegram.ParseMode.MARKDOWN)
+            except:
+                logger.error(f"error news_id = {sample.iloc[i].id}")
+                context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
 
@@ -108,12 +113,19 @@ def feed(update: Update, context: CallbackContext) -> None:
 
     ### DANGER: REMOVE THIS
     sample = df.sample(n=3, weights="score")
-    texts = sample.texts_format.tolist()
 
-    for text in texts:
-        update.message.reply_text(text, parse_mode=telegram.ParseMode.MARKDOWN)
 
-    local_trends = random.choices(trends, k=6)
+    texts_fmt = sample.texts_format.tolist()
+    texts = sample.text.tolist()
+
+    for i, (text, text_fmt) in enumerate(zip(texts, texts_fmt)):
+        try:
+            update.message.reply_text(text_fmt, parse_mode=telegram.ParseMode.MARKDOWN)
+        except:
+            logger.error(f"error news {sample.iloc[i].id}")
+            update.message.reply_text(text)
+
+    local_trends = random.sample(trends, 6)
     keyboard = [
         [
             InlineKeyboardButton(local_trends[0], callback_data='{"button_id": 2, "value": "%s"}' % local_trends[0]),
@@ -172,6 +184,6 @@ def main():
 
 if __name__ == "__main__":
     with open("./data/trends.json", "r", encoding="utf-8") as file:
-        trends = json.load(file)[: 6]
+        trends = json.load(file)
     df, df_trends  = read_data()
     main()

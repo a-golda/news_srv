@@ -137,6 +137,7 @@ class TransformedNews:
             .apply(get_words, sw=self.sw)
         )
 
+        self.df["texts_standard"] = list(map(" ".join, texts))
         normalizer = WordNormalizer()
         logger.info("Texts normalization")
         texts_norm = normalizer.normalize(texts)
