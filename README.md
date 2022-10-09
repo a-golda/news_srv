@@ -11,6 +11,8 @@ pip install -r requirements.txt
 
 Deployment
 
+Скачать и развернуть базу postgres
+
 ```shell
 mkdir -p data
 python src/loaders/vkload.py --output ./data/posts --min_date "2022-10-01" --groups "rbc;ria"
@@ -18,4 +20,8 @@ python src/tranform/create_base_dataset.py --input ./data/posts/prof_media --out
 python src/tranform/create_scoring.py --input ./data/base_dataset.csv --output ./data/scored_dataset.csv --output_trends ./data/trends.csv --output_json ./data/trends.json
 python src/tranform/create_tag_model.py --input ./data/base_dataset.csv --output ./data/tagged_dataset.csv --model_output ./models
 python src/tranform/create_tags.py --input ./data/scored_dataset.csv --model_input ./models/tag_model.sav --output ./data/final.csv
+python src/fill_the_bank.py
+python -m flask run
+python python bot.py
 ```
+
