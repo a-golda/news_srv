@@ -52,10 +52,7 @@ Column('source', String),
 Column('role', String),
 Column('url', String), - url новости из attch
 Column("news_date", timestamp)
-Column("keywords", Array) - 
-Массив с последовательными координатами (номер символа) начала и конца разметки ключевых слов
-0, 5, 7, 30 - выделить символы от 0-го до 5 и от 7 до 30
-Column("key_point", Array) - массив ключевых тем
+Column("text_formated", String)
 Column('date_updated', DateTime))
 Column('parsed_news', String)
 Column('score', float)

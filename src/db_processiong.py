@@ -11,8 +11,7 @@ def update_news_table(reqdict):
                             req.source,
                             req.role,
                             req.url,
-                            req.keywords,
-                            req.key_point,
+                            req.text_formated,
                             req.parsed_news,
                             req.score,
                             req.news_date)

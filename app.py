@@ -75,7 +75,8 @@ def update_user():
         app.logger.info(f"Users history data added successfully!")
         return jsonify(Conf.SUCCESS_STATUS_CODE)
     except Exception as e:
-        app.logger.error(f"Users history table update failed with exception: {e}")
+        app.logger.error(f"{req}")
+        app.logger.error(f"Users table update failed with exception: {e}")
         return jsonify(Conf.FAILED_STATUS_CODE)
 
 
@@ -158,7 +159,7 @@ def get_relevant():
         req = request.get_json()
         news_ids = get_relevant_news(req)
         app.logger.info(f"Selection done successfully!")
-        return jsonify(str(news_ids))
+        return jsonify(news_ids)
     except Exception as e:
         app.logger.error(f"Selection failed with exception: {e}")
         return jsonify(Conf.FAILED_STATUS_CODE)

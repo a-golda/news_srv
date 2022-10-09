@@ -16,9 +16,13 @@ class Conf:
     URL_GET_RELEVANT_NEWS = '/api/get_relevant_news'
 
     URL_DB = 'postgresql://localhost/andrey.golda'
-    mama = 'papa-penis'
 
-    NEWS_AMOUNT = 5
+    NEWS_AMOUNT = 3
 
     SUCCESS_STATUS_CODE: int = 200
     FAILED_STATUS_CODE: int = 400
+
+    MAPPING = {
+                'buh': ['1citsprof', 'buhru_official', 'buhgalteriaru', 'glavbukh', 'forbes'],
+                'business': ['ria', 'lentaru', 'tassagency', 'rt_russian', 'rbc', 'vcru', 'kommersant.economics']
+            }
