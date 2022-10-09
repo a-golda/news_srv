@@ -18,8 +18,7 @@ class NewsPostgreUtils:
                                 Column('source', String),
                                 Column('role', String),
                                 Column('url', String),
-                                Column("keywords", ARRAY(String)),
-                                Column("key_point", ARRAY(Integer)),
+                                Column("text_formated", String),
                                 Column('parsed_news', String),
                                 Column('score', Float),
                                 Column('date_updated', DateTime),
@@ -31,7 +30,7 @@ class NewsPostgreUtils:
         logger.info(f"News table has been created successfully!")
 
     def update_news_table(self, news_id, tag_id, source,
-                          role, url, keywords, key_point,
+                          role, url, text_formated,
                           parsed_news, score, news_date,
                           date_updated=datetime.now()):
 
@@ -41,8 +40,7 @@ class NewsPostgreUtils:
                                                         source=source,
                                                         role=role,
                                                         url=url,
-                                                        keywords=keywords,
-                                                        key_point=key_point,
+                                                        text_formated=text_formated,
                                                         parsed_news=parsed_news,
                                                         score=score,
                                                         news_date=news_date,
@@ -64,12 +62,11 @@ class NewsPostgreUtils:
             "source": result[2],
             "role": result[3],
             "url": result[4],
-            "keywords": result[5],
-            "key_point": result[6],
-            "parsed_news": result[7],
-            "score": result[8],
-            "news_date": result[9],
-            "date_updated": result[10]
+            "text_formated":[5],
+            "parsed_news": result[6],
+            "score": result[7],
+            "news_date": result[8],
+            "date_updated": result[9]
         }
         return response
 
@@ -188,18 +185,16 @@ class GetRelevant:
         self.df = pd.DataFrame()
 
     def get_relevant(self, user_id):
-        select_statement = f'select * from news where news_id not in (select news_id from users_history where user_id={user_id})'
+        select_statement = f'select * from news where news_id not in (select news_id from users_history where user_id={user_id}) and role in (select role from users where user_id={user_id})'
         with self.db.connect() as conn:
             result_set = conn.execute(select_statement)
         self.df = pd.DataFrame(result_set)
         self.df.columns = ['news_id', 'tag_id', 'source', 'role', 'url',
-                           'keywords', 'key_point', 'parsed_news', 'score',
+                           'text_formated', 'parsed_news', 'score',
                            'news_date', 'date_updated']
-        self.df = self.df.sort_values('score', ascending=False)
-        if self.df.shape[0] <= Conf.NEWS_AMOUNT:
-            pass
-        else:
-            self.df = self.df.iloc[:Conf.NEWS_AMOUNT-1]
-        relevant_news_id = self.df.news_id.unique()
-        return relevant_news_id
+        self.df.score = self.df.score.sub(self.df.score.min())
+        self.df.score = self.df.score.divide(self.df.score.sum())
+        self.df = self.df.sample(n=Conf.NEWS_AMOUNT, weights="score")
+        relevant_news = self.df.to_dict('records')
 
+        return relevant_news

@@ -1,3 +1,5 @@
+import requests
+from pandas import DataFrame
 from typing import Any
 from telegram.ext.updater import Updater
 from telegram.update import Update
@@ -65,7 +67,7 @@ def button(update: Update, context: CallbackContext) -> None:
             text=f"Отлично! 😎\n Для того, чтобы получать новости, используй команду /feed"
         )
         logger.info(f"User {query.from_user.id} selected {query.data}")
-        send_info(query.from_user.to_dict(), data["value"])
+        send_info(query.from_user, data["value"])
 
     elif data["button_id"] == 1:
         if data["value"] == 0:
@@ -98,9 +100,18 @@ def button(update: Update, context: CallbackContext) -> None:
 def send_info(user: Any, value: int) -> None:
     """sends info to service"""
     role = "buh" if value == 0 else "business"
-    user_data = dict(user)
-    user_data["role"] = role
+    user_data = {
+        "user_id": user.id,
+        "is_bot": user.is_bot,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "username": user.username,
+        "role": role,
+        "language_code": user.language_code
+    }
     logger.info(f"Sending user data {user_data}")
+    url = f"{host}/api/update_users"
+    requests.post(url, json=user_data)
 
 
 def help(update: Update, context: CallbackContext) -> None:
@@ -117,11 +128,14 @@ def feed(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Вот сегодняшняя подборка новостей 👋")
 
     ### DANGER: REMOVE THIS
-    sample = df.sample(n=3, weights="score")
-
-
-    texts_fmt = sample.texts_format.tolist()
-    texts = sample.text.tolist()
+    user_id = update.message.from_user.id
+    url = f"{host}/api/get_relevant_news"
+    content = requests.get(url, json={"user_id": user_id})
+    json_content = json.loads(content.text)
+    logger.info(content.text)
+    sample = DataFrame(json_content)
+    texts_fmt = sample.text_formated.tolist()
+    texts = sample.parsed_news.tolist()
 
     for i, (text, text_fmt) in enumerate(zip(texts, texts_fmt)):
         try:
@@ -169,7 +183,7 @@ def read_data() -> DataFrame:
     df = read_csv("./data/final.csv")
     df.score = df.score.add(df.score.min())
     df.score = df.score.divide(df.score.sum())
-    
+
     df_trends =read_csv("./data/trends.csv")
 
     return df, df_trends
@@ -190,5 +204,8 @@ def main():
 if __name__ == "__main__":
     with open("./data/trends.json", "r", encoding="utf-8") as file:
         trends = json.load(file)
-    df, df_trends  = read_data()
+    with open("./secrets.txt", "r", encoding="utf-8") as file:
+        content = file.read().splitlines()
+    host = content[0].split("=")[1]
+    df, df_trends = read_data()
     main()
