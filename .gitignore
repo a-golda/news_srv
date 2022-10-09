@@ -164,3 +164,4 @@ vk_config.v2.json
 *.txt
 .vscode
 *.sav
+!requirements.txt
