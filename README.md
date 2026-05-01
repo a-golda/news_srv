@@ -1,4 +1,6 @@
 # news_srv
+Micro-service to scrap news and build insights based on them
+
 Alias of news
 
 Build
